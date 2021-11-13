@@ -1,15 +1,5 @@
-from commands import Ls, Mkdir, Cd, Quit, Touch, Pwd
 from errors import DirectoryMissing, FileMissing
 from factories import CommandFactory
-
-possible_commands = {    # this could be replace with a Command Factory
-    'ls': Ls,
-    'mkdir': Mkdir,
-    'cd': Cd,
-    'quit': Quit,
-    'touch': Touch,
-    'pwd': Pwd
-}
 
 
 class CommandParser:

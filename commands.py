@@ -5,10 +5,8 @@ from errors import DirectoryMissing, FileMissing
 
 
 class Ls(Command):
-    def execute_action(*params):
-
-        path = os.getcwd()
-        print(' '.join(os.listdir(path)))
+    def execute_action(self):
+        print(' '.join(os.listdir()))
         # TODO: recursion
 
 
@@ -59,7 +57,7 @@ class Touch(Command):
 
 
 class Pwd(Command):
-    def execute_action(*params):
+    def execute_action(self):
         print(os.getcwd())
 
 
