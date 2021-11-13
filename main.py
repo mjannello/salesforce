@@ -1,64 +1,6 @@
-from abc import ABC, abstractmethod
-import os
-
-
-class Command(ABC):
-    @abstractmethod
-    def execute_action(self):
-        pass
-
-    @staticmethod
-    def validate_parameters_existence(params):
-        if not params:
-            print('invalid command')
-            raise Exception('')
-
-
-class Ls(Command):
-    def execute_action(*params):
-
-        path = os.getcwd()
-        print(os.listdir(path))
-        # TODO: recursion
-
-
-class Mkdir(Command):
-    def execute_action(*params):
-        Command.validate_parameters_existence(params)
-        directory = params[0]
-        if os.path.isdir(directory):
-            print('Directory already exists')
-            return
-        os.mkdir(directory)
-
-
-class Cd(Command):
-    def execute_action(*params):
-        Command.validate_parameters_existence(params)
-
-        final_directory = params[0]
-        if not os.path.isdir(final_directory):
-            print('Invalid directory')
-            return
-        os.chdir(final_directory)
-
-
-class Quit(Command):
-    def execute_action(*params):
-        exit()
-
-
-class Touch(Command):
-    def execute_action(*params):
-        file_name = params[0]
-        with open(file_name, mode='a'):
-            return
-
-
-class Pwd(Command):
-    def execute_action(*params):
-        print(os.getcwd())
-
+from commands import Ls, Mkdir, Cd, Quit, Touch, Pwd
+from errors import DirectoryMissing, FileMissing
+from factories import CommandFactory
 
 possible_commands = {    # this could be replace with a Command Factory
     'ls': Ls,
@@ -71,15 +13,17 @@ possible_commands = {    # this could be replace with a Command Factory
 
 
 class CommandParser:
+
     @staticmethod
     def parse(command_string):
-        params = command_string.split()
-        cmd_name = params.pop(0)
-        cmd = possible_commands.get(cmd_name)
-        if not cmd:
-            print('Unrecognized command')
-            raise Exception
-        cmd.execute_action(' '.join(params))
+        cmd_factory = CommandFactory()
+        input_string_list = command_string.split()
+        cmd_name = input_string_list[0]
+        cmd_params = input_string_list[1:]
+        try:
+            return cmd_factory.create_command(cmd_name, *cmd_params)
+        except (DirectoryMissing, FileMissing) as exception:
+            raise exception
 
 
 if __name__ == '__main__':
@@ -88,7 +32,13 @@ if __name__ == '__main__':
         line = input()
         if not line:
             continue
-        CommandParser.parse(command_string=line)
+        try:
+            cmd = CommandParser.parse(command_string=line)
+            cmd.execute_action()
+        except (DirectoryMissing, FileMissing) as e:
+            print(e.message)
+
+
 
 
 
