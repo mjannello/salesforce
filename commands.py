@@ -6,8 +6,18 @@ from errors import DirectoryMissing, FileMissing
 
 class Ls(Command):
     def execute_action(self):
-        print(' '.join(os.listdir()))
-        # TODO: recursion
+        current_directory = str(os.getcwd())
+
+        def listdir(root_directory):
+            for it in os.scandir(root_directory):
+                if it.is_dir():
+                    print(it.path)
+                    print(' '.join(os.listdir(it.path)))
+                    listdir(it)
+        if '-r' in self.params:
+            return listdir(current_directory)
+        else:
+            print(' '.join(os.listdir(current_directory)))
 
 
 class Mkdir(Command):
